@@ -1,7 +1,8 @@
 #include<iostream>
 
 using namespace std;
-
+class ForwardList;
+ForwardList operator+(const ForwardList& left, const ForwardList& right);
 class Element
 {
 	int Data; //данные
@@ -16,6 +17,7 @@ public:
 		cout << "Element destructor\t" << this << endl;
 	}
 	friend class ForwardList;
+	friend ForwardList operator+(const ForwardList& left, const ForwardList& right);
 };
 
 class ForwardList
@@ -28,63 +30,39 @@ public:
 		cout << "FList constructor\t" << this << endl;
 	}
 
-	ForwardList(const ForwardList& other)
+	ForwardList(const ForwardList& other) :ForwardList()
 	{
-		Head = new Element(other.Head->Data);
-		Element* el = Head;
-		Element* el_other = other.Head;
-		while (el_other->pNext)
-		{
-			while (el->pNext)
-			{
-				el = el->pNext;
-			}
-			el_other = el_other->pNext;
-			el->pNext = new Element(el_other->Data);
-			
-		}
+		/*for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
+			push_back(Temp->Data);*/
+		*this = other;
 		cout << "FList copy constructor\t" << this << endl;
 	}
+
 	ForwardList(ForwardList&& other) noexcept
 	{
-		Head = other.Head;
-		other.Head = nullptr;
+		*this = other;
 		cout << "FList move constructor\t" << this << endl;
 	}
 
 	~ForwardList()
 	{
-		Element* el = Head->pNext;
-		delete Head;
-		while (el)
-		{
-			Head = el;
-			el = Head->pNext;
-			delete Head;
-		}
+		while (Head) pop_front();
 		cout << "FList destructor\t" << this << endl;
 	}
 
 	ForwardList& operator=(const ForwardList& other)
 	{
-		Head = new Element(other.Head->Data);
-		Element* el = Head;
-		Element* el_other = other.Head;
-		while (el_other->pNext)
-		{
-			while (el->pNext)
-			{
-				el = el->pNext;
-			}
-			el_other = el_other->pNext;
-			el->pNext = new Element(el_other->Data);
-
-		}
+		if (this == &other) return *this;
+		while (Head)pop_front();
+		for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
+			push_back(Temp->Data);
 		cout << "FList copy assignment\t" << this << endl;
 		return *this;
 	}
 	ForwardList& operator=(ForwardList&& other) noexcept
 	{
+		if (this == &other) return *this;
+		while (Head)pop_front();
 		Head = other.Head;
 		other.Head = nullptr;
 		cout << "FList move assignment\t" << this << endl;
@@ -98,6 +76,7 @@ public:
 	}
 	void push_back(int data)
 	{
+		if (Head == nullptr) return push_front(data);
 		Element* el = Head;
 		while (el->pNext)
 		{
@@ -107,80 +86,106 @@ public:
 	}
 	void insert(int data, int index)
 	{
-		Element* el = Head;
-		int pos = 0;
-		while (pos != index - 1)
-		{
-			el = el->pNext;
-			pos++;
-		}
-		el->pNext = new Element(data, el->pNext);
+		if (index == 0) return push_front(data);
+		Element* temp = Head;
+		for (int i = 0; i < index - 1; i++)
+			if (temp->pNext)temp = temp->pNext;
+			else return;
+		temp->pNext = new Element(data, temp->pNext);
 	}
 
 	void pop_front()
 	{
-		Element* el = Head;
-		el = el->pNext;
-		delete Head;
-		Head = el;
+		Element* erased = Head;
+		Head = Head->pNext;
+		delete erased;
 	}
 	void pop_back()
 	{
 		Element* el = Head;
-		while (el->pNext->pNext)
-		{
-			el = el->pNext;
-		}
+		while (el->pNext->pNext) el = el->pNext;
 		delete el->pNext;
 		el->pNext = nullptr;
 	}
 	void erase(int index)
 	{
-		int pos = 0;
-		Element* el = Head;
-		while (pos != index - 1)
-		{
-			el = el->pNext;
-			pos++;
-		}
-		Element* temp = el->pNext->pNext;
-		delete el->pNext;
-		el->pNext = temp;
+		if (index == 0)return pop_front();
+		Element* Temp = Head;
+		for (int i = 0; i < index - 1; i++)
+			if (Temp->pNext)
+				Temp = Temp->pNext;
+			else return;
+		Element* erased = Temp->pNext;
+		Temp->pNext = Temp->pNext->pNext;
+		delete erased;
 	}
 
 	void print()const
 	{
-		Element* el = Head; // Итератор - эуказатель при помощи которого можно получить доступ к элементам структуры данных
-		while (el)
-		{
-			cout << el << "\t" << el->Data << "\t" << el->pNext << endl;
-			el = el->pNext;
-		}
+		//Element* el = Head; // Итератор - эуказатель при помощи которого можно получить доступ к элементам структуры данных
+		//while (el)
+		//{
+		//	cout << el << "\t" << el->Data << "\t" << el->pNext << endl;
+		//	el = el->pNext;
+		//}
+		for(Element* Temp = Head; Temp; Temp = Temp->pNext)
+			cout << Temp << "\t" << Temp->Data << "\t" << Temp->pNext << endl;
 	}
+	friend class Element;
+	friend ForwardList operator+(const ForwardList& left, const ForwardList& right);
 };
 
+ForwardList operator+(const ForwardList& left, const ForwardList& right)
+{
+	ForwardList cat = left;
+	for (Element* Temp = right.Head; Temp; Temp = Temp->pNext) cat.push_back(Temp->Data);
+	return cat;
+}
 
-
+//#define BASE_CHECK
+#define OPERATOR_PLUS_CHECK
 void main()
 {
 	setlocale(LC_ALL, "");
+#ifdef BASE_CHECK
 	int n;
 	cout << "Введите размер списка: "; cin >> n;
 	ForwardList list;
-	for(int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 	{
-		list.push_front(rand() % 100);
+		list.push_back(rand() % 100);
 	}
 	list.print();
-	cout << endl;
-	list.erase(2);
+	/*int value;
+	int index;
+	cout << "Enter value:\t";
+	cin >> value;
+	cout << "Enter index:\t";
+	cin >> index;
+	list.insert(value, index);
 	list.print();
-	list.push_back(100);
-	list.print();
-	cout << "move" << endl;
-	ForwardList list1 = move(list);
+	list.erase(index);
+	list.print();*/
+	//ForwardList list2 = list;
+	ForwardList list2;
+	list2 = list;
+	list2.print();
+	list = list;
+	list2.print();
+#endif // BASE_CHECK
+
+	ForwardList list1;
+	list1.push_back(3);
+	list1.push_back(5);
+	list1.push_back(8);
+	list1.push_back(13);
+	list1.push_back(21);
 	list1.print();
 	ForwardList list2;
-	list2 = list1;
+	list2.push_back(34);
+	list2.push_back(55);
+	list2.push_back(89);
 	list2.print();
+	ForwardList list3 = move(list1 + list2);
+	list3.print();
 }
