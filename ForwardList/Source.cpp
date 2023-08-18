@@ -1,33 +1,92 @@
 #include<iostream>
 
 using namespace std;
+class Iterator;
+class Element;
 class ForwardList;
 ForwardList operator+(const ForwardList& left, const ForwardList& right);
+
 class Element
 {
 	int Data; //данные
 	Element* pNext; // указатель на следующий элемент
+
 public:
 	Element(int Data, Element* pNext = nullptr) :Data(Data), pNext(pNext)
 	{
 		cout << "Element constructor\t" << this << endl;
 	}
+
 	~Element()
 	{
 		cout << "Element destructor\t" << this << endl;
 	}
+
 	friend class ForwardList;
 	friend ForwardList operator+(const ForwardList& left, const ForwardList& right);
+	friend class Iterator;
+};
+
+class Iterator
+{
+	Element* Temp;
+
+public:
+	Iterator(Element* Temp = nullptr) :Temp(Temp)
+	{
+		cout << "Iterator constructor:\t" << this << endl;
+	}
+
+	~Iterator()
+	{
+		cout << "Iterator destructor:\t" << this << endl;
+	}
+
+	Iterator& operator++()
+	{
+		Temp = Temp->pNext;
+		return *this;
+	}
+
+	bool operator==(const Iterator& other) const
+	{
+		return this->Temp == other.Temp;
+
+	}
+
+	bool operator!=(const Iterator& other) const
+	{
+		return this->Temp != other.Temp;
+	}
+
+	int operator*()
+	{
+		return Temp->Data;
+	}
 };
 
 class ForwardList
 {
 	Element* Head; // содержит адрес начального элемента списка
+
 public:
 	ForwardList()
 	{
 		Head = nullptr; // если список пуст, то его голова указывает на ноль
 		cout << "FList constructor\t" << this << endl;
+	}
+
+	ForwardList(const std::initializer_list<int>& il): ForwardList()
+	{
+		//int* - неконстантный указатель на переменную
+		//const int* - неконстантный указатель на константу
+		//int* const - константный указатель на неконстантную переменную
+		//const int* const - константный указатель на константу
+		for(int const* it = il.begin(); it != il.end(); it++)
+		{
+			push_back(*it);
+		}
+		cout << "FList move constructor\t" << this << endl;
 	}
 
 	ForwardList(const ForwardList& other) :ForwardList()
@@ -38,7 +97,7 @@ public:
 		cout << "FList copy constructor\t" << this << endl;
 	}
 
-	ForwardList(ForwardList&& other) noexcept
+	ForwardList(ForwardList&& other) noexcept :ForwardList()
 	{
 		*this = other;
 		cout << "FList move constructor\t" << this << endl;
@@ -59,6 +118,7 @@ public:
 		cout << "FList copy assignment\t" << this << endl;
 		return *this;
 	}
+
 	ForwardList& operator=(ForwardList&& other) noexcept
 	{
 		if (this == &other) return *this;
@@ -74,6 +134,7 @@ public:
 	{
 		Head = new Element(data, Head);
 	}
+
 	void push_back(int data)
 	{
 		if (Head == nullptr) return push_front(data);
@@ -84,6 +145,7 @@ public:
 		}
 		el->pNext = new Element(data);
 	}
+
 	void insert(int data, int index)
 	{
 		if (index == 0) return push_front(data);
@@ -100,6 +162,7 @@ public:
 		Head = Head->pNext;
 		delete erased;
 	}
+
 	void pop_back()
 	{
 		Element* el = Head;
@@ -107,6 +170,7 @@ public:
 		delete el->pNext;
 		el->pNext = nullptr;
 	}
+
 	void erase(int index)
 	{
 		if (index == 0)return pop_front();
@@ -120,6 +184,16 @@ public:
 		delete erased;
 	}
 
+	Iterator begin()
+	{
+		return Head;
+	}
+
+	Iterator end()
+	{
+		return nullptr;
+	}
+
 	void print()const
 	{
 		//Element* el = Head; // Итератор - эуказатель при помощи которого можно получить доступ к элементам структуры данных
@@ -131,6 +205,7 @@ public:
 		for(Element* Temp = Head; Temp; Temp = Temp->pNext)
 			cout << Temp << "\t" << Temp->Data << "\t" << Temp->pNext << endl;
 	}
+
 	friend class Element;
 	friend ForwardList operator+(const ForwardList& left, const ForwardList& right);
 };
@@ -143,10 +218,13 @@ ForwardList operator+(const ForwardList& left, const ForwardList& right)
 }
 
 //#define BASE_CHECK
-#define OPERATOR_PLUS_CHECK
+//#define OPERATOR_PLUS_CHECK
+//#define RANGE_BASED_FOR_ARRAY
+#define RANGE_BASED_FOR_LIST
 void main()
 {
 	setlocale(LC_ALL, "");
+
 #ifdef BASE_CHECK
 	int n;
 	cout << "Введите размер списка: "; cin >> n;
@@ -174,6 +252,7 @@ void main()
 	list2.print();
 #endif // BASE_CHECK
 
+#ifdef OPERATOR_PLUS_CHECK
 	ForwardList list1;
 	list1.push_back(3);
 	list1.push_back(5);
@@ -188,4 +267,24 @@ void main()
 	list2.print();
 	ForwardList list3 = move(list1 + list2);
 	list3.print();
+#endif // OPERATOR_PLUS_CHECK
+
+#ifdef RANGE_BASED_FOR_ARRAY
+	int list[] = { 3, 5, 8, 13, 21 };
+	for (int i : list)
+	{
+		cout << i << endl;
+	}
+#endif // RANGE_BASED_FOR_ARRAY
+
+#ifdef RANGE_BASED_FOR_LIST
+	ForwardList list = { 3, 5, 8, 13, 21 };
+	list.print();
+	for(int i : list)
+	{
+		cout << i << endl;
+	}
+
+#endif // RANGE_BASED_FOR_LIST
+
 }
