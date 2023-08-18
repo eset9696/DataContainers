@@ -5,7 +5,7 @@ class Iterator;
 class Element;
 class ForwardList;
 ForwardList operator+(const ForwardList& left, const ForwardList& right);
-
+#define delimeter "\n-----------------------------\n"
 class Element
 {
 	int Data; //данные
@@ -89,6 +89,12 @@ public:
 		cout << "FList move constructor\t" << this << endl;
 	}
 
+	ForwardList(ForwardList&& other) noexcept :ForwardList()
+	{
+		*this = std::move(other); // функция move() принудительно вызывает MoveAssignment для объекта
+		cout << "FList move constructor\t" << this << endl;
+	}
+
 	ForwardList(const ForwardList& other) :ForwardList()
 	{
 		/*for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
@@ -97,11 +103,7 @@ public:
 		cout << "FList copy constructor\t" << this << endl;
 	}
 
-	ForwardList(ForwardList&& other) noexcept :ForwardList()
-	{
-		*this = other;
-		cout << "FList move constructor\t" << this << endl;
-	}
+	
 
 	~ForwardList()
 	{
@@ -123,7 +125,7 @@ public:
 	{
 		if (this == &other) return *this;
 		while (Head)pop_front();
-		Head = other.Head;
+		this->Head = other.Head;
 		other.Head = nullptr;
 		cout << "FList move assignment\t" << this << endl;
 		return *this;
@@ -220,7 +222,8 @@ ForwardList operator+(const ForwardList& left, const ForwardList& right)
 //#define BASE_CHECK
 //#define OPERATOR_PLUS_CHECK
 //#define RANGE_BASED_FOR_ARRAY
-#define RANGE_BASED_FOR_LIST
+//#define RANGE_BASED_FOR_LIST
+#define MOVE_SEMANTIC_CHECK
 void main()
 {
 	setlocale(LC_ALL, "");
@@ -286,5 +289,18 @@ void main()
 	}
 
 #endif // RANGE_BASED_FOR_LIST
+
+#ifdef MOVE_SEMANTIC_CHECK
+	ForwardList list1 = { 3, 5, 8, 13, 21 };
+	for(int i: list1)cout << i << "\t"; cout << endl;
+	cout << delimeter << endl;
+	ForwardList list2 = { 34, 55, 89 };
+	for (int i : list2)cout << i << "\t"; cout << endl;
+	cout << delimeter << endl;
+	ForwardList list3 = list1 + list2;
+	cout << delimeter << endl;
+	for (int i : list3)cout << i << "\t"; cout << endl;
+
+#endif // MOVE_SEMANTIC_CHECK
 
 }
