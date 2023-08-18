@@ -89,12 +89,6 @@ public:
 		cout << "FList move constructor\t" << this << endl;
 	}
 
-	ForwardList(ForwardList&& other) noexcept :ForwardList()
-	{
-		*this = std::move(other); // функция move() принудительно вызывает MoveAssignment для объекта
-		cout << "FList move constructor\t" << this << endl;
-	}
-
 	ForwardList(const ForwardList& other) :ForwardList()
 	{
 		/*for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
@@ -103,7 +97,11 @@ public:
 		cout << "FList copy constructor\t" << this << endl;
 	}
 
-	
+	ForwardList(ForwardList&& other) noexcept :ForwardList()
+	{
+		*this = std::move(other); // функция move() принудительно вызывает MoveAssignment для объекта
+		cout << "FList move constructor\t" << this << endl;
+	}
 
 	~ForwardList()
 	{
