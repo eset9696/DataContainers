@@ -192,6 +192,8 @@ public:
 		while (Head) pop_fornt();
 		this->Head = other.Head;
 		other.Head = nullptr;
+		this->End = other.End;
+		other.End = nullptr;
 		cout << "List move assignment:\t" << this << endl;
 	}
 
