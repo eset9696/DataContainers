@@ -96,7 +96,7 @@ public:
 		cout << "List copy constructor:\t" << this << endl;
 	}
 
-	List(List&& other) : List()
+	List(List&& other) noexcept : List()
 	{
 		*this = move(other);
 		cout << "List move constructor:\t" << endl;
@@ -104,12 +104,12 @@ public:
 
 	~List()
 	{
-		while (Head)	pop_fornt();
+		while (Head) pop_fornt();
 		cout << "List destructor:\t" << this << endl;
 	}
 	void push_front(int data)
 	{
-		if (Head == nullptr)
+		if (!Head)
 		{
 			Head = new Element(data, 0, Head);
 			End = Head;
@@ -146,8 +146,6 @@ public:
 		if (Head->pNext)Head->pNext->pPrev = Head->pPrev;
 		Head = Head->pNext;
 		delete Erased;
-
-
 	}
 
 	void pop_back()
@@ -173,24 +171,10 @@ public:
 		delete erase;
 	}
 
-	void printN() const
+	void print() const
 	{
-		Element* Temp = Head;
-		while (Temp)
-		{
+		for(Element* Temp = Head; Temp; Temp = Temp->pNext) 
 			cout << Temp->pPrev << tab << Temp << tab << Temp->data << tab << Temp->pNext << endl;
-			Temp = Temp->pNext;
-		}
-	}
-
-	void printP() const
-	{
-		Element* Temp = End;
-		while (Temp)
-		{
-			cout << Temp->pPrev << tab << Temp << tab << Temp->data << tab << Temp->pNext << endl;
-			Temp = Temp->pPrev;
-		}
 	}
 
 	List& operator=(const List& other)
@@ -202,7 +186,7 @@ public:
 		return *this;
 	}
 
-	List& operator=(List&& other)
+	List& operator=(List&& other) noexcept
 	{
 		if (this == &other) return *this;
 		while (Head) pop_fornt();
@@ -231,29 +215,28 @@ void main()
 	List list;
 
 	for (int i = 0; i < 5; i++)list.push_back(rand() % 100);
-	list.printN();
+	list.print();
 #ifdef METHODS_CHECK
 	cout << delimeter << endl;
-	list.printP();
 	cout << delimeter << endl;
 	list.insert(100, 0);
-	list.printN();
+	list.print();
 	cout << delimeter << endl;
 	list.erase(0);
-	list.printN();
+	list.print();
 	cout << delimeter << endl;
 	list.pop_fornt();
-	list.printN();
+	list.print();
 	cout << delimeter << endl;
 	list.pop_back();
-	list.printN();
+	list.print();
 #endif // METHODS_CHECK
 #ifdef COPY_SEMANTIC_CHECK
 	List list2 = list;
-	list2.printN();
+	list2.print();
 	List list3;
 	list3 = list2;
-	list3.printN();
+	list3.print();
 #endif // COPY_SEMANTIC_CHECK
 
 #ifdef MOVE_SEMANTIC_CHECK
@@ -262,7 +245,7 @@ void main()
 	list3.printN();
 #endif // MOVE_SEMANTIC_CHECK
 	List list1 = { 1, 2, 3, 4, 5 };
-	list1.printN();
+	list1.print();
 	for (int i : list1)
 	{
 		cout << i << tab;
