@@ -104,7 +104,7 @@ public:
 
 	~List()
 	{
-		while (Head) pop_fornt();
+		while (Head) pop_front();
 		cout << "List destructor:\t" << this << endl;
 	}
 	void push_front(int data)
@@ -140,7 +140,7 @@ public:
 
 	}
 
-	void pop_fornt()
+	void pop_front()
 	{
 		Element* Erased = Head;
 		if (Head->pNext)Head->pNext->pPrev = Head->pPrev;
@@ -158,7 +158,7 @@ public:
 
 	void erase(int index)
 	{
-		if (!index) return pop_fornt();
+		if (!index) return pop_front();
 		Element* Temp = Head;
 		for (int i = 0; i < index - 1; i++)
 		{
@@ -180,7 +180,7 @@ public:
 	List& operator=(const List& other)
 	{
 		if (this == &other) return *this;
-		while (this->Head) pop_fornt();
+		while (this->Head) pop_front();
 		for (Element* Temp = other.Head; Temp; Temp = Temp->pNext) push_back(Temp->data);
 		cout << "List copy assignment:\t" << this << endl;
 		return *this;
@@ -189,7 +189,7 @@ public:
 	List& operator=(List&& other) noexcept
 	{
 		if (this == &other) return *this;
-		while (Head) pop_fornt();
+		while (Head) pop_front();
 		this->Head = other.Head;
 		other.Head = nullptr;
 		this->End = other.End;
