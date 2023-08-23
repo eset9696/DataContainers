@@ -27,6 +27,7 @@ class List
 		}
 		friend class List;
 		friend class Iterator;
+		friend class ReIterator;
 	} *Head, *Tail;
 	unsigned int size;
 
@@ -65,6 +66,7 @@ class List
 		}
 	};
 
+public:
 	class ReIterator
 	{
 		Element* Temp;
@@ -100,7 +102,7 @@ class List
 		}
 	};
 
-public:
+
 	List()
 	{
 		Head = Tail = nullptr;
@@ -111,6 +113,18 @@ public:
 	{
 		for (const int* it = il.begin(); it != il.end(); it++) push_back(*it);
 		cout << "L IL Constructor:\t" << this << endl;
+	}
+
+	List(const List& other) : List()
+	{
+		*this = other;
+		cout << "L move Constructor:\t" << this << endl;
+	}
+
+	List(List&& other) noexcept : List()
+	{
+		*this = move(other);
+		cout << "L move Constructor:\t" << this << endl;
 	}
 
 	~List()
@@ -233,7 +247,28 @@ public:
 			cout << Temp->pNext << tab << Temp << tab << Temp->Data << tab << Temp->pPrev << endl;
 	}
 
+	//operators
+
+	List& operator=(List&& other) noexcept
+	{
+		while (Head) pop_front();
+		this->Head = other.Head;
+		this->Tail = other.Tail;
+		other.Head = nullptr;
+		other.Tail = nullptr;
+		cout << "L move assignment:\t" << endl;
+	}
+
+	List& operator=(const List& other)
+	{
+		if (this == &other) return *this;
+		while (Head) pop_front();
+		for (Element* Temp = other.Head; Temp; Temp = Temp->pNext) push_back(Temp->Data);
+		cout << "L copy assignment:\t" << endl;
+	}
+
 	friend class Iterator;
+	friend class ReIterator;
 };
 
 //#define BASE_CHECK
@@ -272,10 +307,9 @@ void main()
 	}
 	cout << endl;
 
-	auto&& range = list;
-	for (auto b = list.r_begin(), e = list.r_end(); b != e; ++b) {
+	for (List::ReIterator b = list.r_begin(), e = list.r_end(); b != e; ++b) {
 		int i = *b;
 		cout << i << tab;
 	}
-	cout << endl;
+	list.print();
 }
