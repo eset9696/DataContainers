@@ -7,12 +7,10 @@ using namespace std;
 class List;
 class Element;
 class Iterator;
-class Reversed_Iterator;
+class ReIterator;
 
 class List
 {
-	
-
 	class Element
 	{	
 		int Data;
@@ -66,6 +64,42 @@ class List
 			return Temp->Data;
 		}
 	};
+
+	class ReIterator
+	{
+		Element* Temp;
+	public:
+		ReIterator(Element* Temp) : Temp(Temp)
+		{
+			cout << "ReItConstructor:\t" << this << endl;
+		}
+		~ReIterator()
+		{
+			cout << "ReItDestructor:\t" << this << endl;
+		}
+
+		Element& operator++()
+		{
+			Temp = Temp->pPrev;
+			return *Temp;
+		}
+
+		bool operator==(const ReIterator& other)
+		{
+			return this->Temp == other.Temp;
+		}
+
+		bool operator!=(const ReIterator& other)
+		{
+			return this->Temp != other.Temp;
+		}
+
+		int operator*()
+		{
+			return Temp->Data;
+		}
+	};
+
 public:
 	List()
 	{
@@ -93,6 +127,16 @@ public:
 	}
 
 	Iterator end()
+	{
+		return nullptr;
+	}
+
+	ReIterator r_begin()
+	{
+		return Tail;
+	}
+
+	ReIterator r_end()
 	{
 		return nullptr;
 	}
@@ -224,6 +268,14 @@ void main()
 
 	for (int i : list)
 	{
-		cout << i << tab << endl;
+		cout << i << tab;
 	}
+	cout << endl;
+
+	auto&& range = list;
+	for (auto b = list.r_begin(), e = list.r_end(); b != e; ++b) {
+		int i = *b;
+		cout << i << tab;
+	}
+	cout << endl;
 }
