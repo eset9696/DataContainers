@@ -31,77 +31,115 @@ class List
 	} *Head, *Tail;
 	unsigned int size;
 
-	class Iterator
+public:
+	class BaseIterator
 	{
+	protected:
 		Element* Temp;
 	public:
-		Iterator(Element* Temp) : Temp(Temp)
+		BaseIterator(Element* Temp) : Temp(Temp)
+		{
+			cout << "BaseIterator constructor" << this << endl;
+		}
+
+		~BaseIterator()
+		{
+			cout << "BaseIterator destructor" << this << endl;
+		}
+
+		bool operator==(const BaseIterator& other) const
+		{
+			return this->Temp == other.Temp;
+		}
+
+		bool operator!=(const BaseIterator& other) const
+		{
+			return this->Temp != other.Temp;
+		}
+
+		const int& operator*() const
+		{
+			return Temp->Data;
+		}
+	};
+
+	class ConstIterator : public BaseIterator
+	{
+	public:
+		ConstIterator(Element* Temp = nullptr) : BaseIterator(Temp)
 		{
 			cout << "ItConstructor:\t" << this << endl;
 		}
-		~Iterator()
+		~ConstIterator()
 		{
 			cout << "ItDestructor:\t" << this << endl;
 		}
 
-		Element& operator++()
+		ConstIterator& operator++()
 		{
 			Temp = Temp->pNext;
-			return *Temp;
+			return *this;
 		}
 
-		bool operator==(const Iterator& other)
+		ConstIterator operator++(int)
 		{
-			return this->Temp == other.Temp;
+			ConstIterator Old = *this;
+			Temp = Temp->pNext;
+			return Old;
 		}
 
-		bool operator!=(const Iterator& other)
+		ConstIterator& operator--()
 		{
-			return this->Temp != other.Temp;
+			Temp = Temp->pPrev;
+			return *this;
 		}
 
-		int operator*()
+		ConstIterator operator--(int)
 		{
-			return Temp->Data;
+			ConstIterator Old = *this;
+			Temp = Temp->pPrev;
+			return Old;
 		}
 	};
 
-public:
-	class ReIterator
+	class ConstReIterator: BaseIterator
 	{
-		Element* Temp;
 	public:
-		ReIterator(Element* Temp) : Temp(Temp)
+		ConstReIterator(Element* Temp = nullptr) : BaseIterator(Temp)
 		{
 			cout << "ReItConstructor:\t" << this << endl;
 		}
-		~ReIterator()
+		~ConstReIterator()
 		{
 			cout << "ReItDestructor:\t" << this << endl;
 		}
 
-		Element& operator++()
+		ConstReIterator& operator++()
 		{
 			Temp = Temp->pPrev;
-			return *Temp;
+			return *this;
 		}
 
-		bool operator==(const ReIterator& other)
+		ConstReIterator operator++(int)
 		{
-			return this->Temp == other.Temp;
+			ConstReIterator Old = *this;
+			Temp = Temp->pPrev;
+			return Old;
 		}
 
-		bool operator!=(const ReIterator& other)
+		ConstReIterator& operator--()
 		{
-			return this->Temp != other.Temp;
+			Temp = Temp->pNext;
+			return *this;
 		}
 
-		int operator*()
+		ConstReIterator operator--(int)
 		{
-			return Temp->Data;
+			ConstReIterator Old = *this;
+			Temp = Temp->pNext;
+			return Old;
 		}
 	};
-
 
 	List()
 	{
@@ -133,24 +171,24 @@ public:
 		cout << "LDestructor:\t" << this << endl;
 	}
 
-	//Itarator
+	//Itarators & ReIterators begin() & end()
 
-	Iterator begin()
+	const ConstIterator begin() const
 	{
 		return Head;
 	}
 
-	Iterator end()
+	const ConstIterator end() const
 	{
 		return nullptr;
 	}
 
-	ReIterator r_begin()
+	const ConstReIterator r_begin() const
 	{
 		return Tail;
 	}
 
-	ReIterator r_end()
+	const ConstReIterator r_end() const
 	{
 		return nullptr;
 	}
@@ -248,28 +286,38 @@ public:
 	}
 
 	//operators
+	
+	List& operator=(const List& other)
+	{
+		if (this == &other) return *this;
+		while (Head) pop_front();
+		for (Element* Temp = other.Head; Temp; Temp = Temp->pNext) push_back(Temp->Data);
+		cout << "L copy assignment:\t" << this << endl;
+		return *this;
+	}
 
 	List& operator=(List&& other) noexcept
 	{
 		while (Head) pop_front();
 		this->Head = other.Head;
 		this->Tail = other.Tail;
+		this->size = other.size;
 		other.Head = nullptr;
 		other.Tail = nullptr;
-		cout << "L move assignment:\t" << endl;
-	}
-
-	List& operator=(const List& other)
-	{
-		if (this == &other) return *this;
-		while (Head) pop_front();
-		for (Element* Temp = other.Head; Temp; Temp = Temp->pNext) push_back(Temp->Data);
-		cout << "L copy assignment:\t" << endl;
+		other.size = 0;
+		cout << "L move assignment:\t" << this << endl;
+		return *this;
 	}
 
 	friend class Iterator;
 	friend class ReIterator;
 };
+List operator+(const List& left, const List& right)
+{
+	List cat = left;
+	for (List::ConstIterator it = right.begin(); it != right.end(); ++it) cat.push_back(*it);
+	return cat;
+}
 
 //#define BASE_CHECK
 void main()
@@ -298,18 +346,25 @@ void main()
 	list.reverse_print();
 #endif // BASE_CHECK
 
-	List list = {3, 5, 8, 13, 21};
+	//List list = {3, 5, 8, 13, 21};
+	////list.print();
+
+	//for (int i : list)
+	//{
+	//	cout << i << tab;
+	//}
+	//cout << endl;
+
+	//for (List::ReIterator b = list.r_begin(), e = list.r_end(); b != e; ++b) {
+	//	int i = *b;
+	//	cout << i << tab;
+	//}
 	//list.print();
 
-	for (int i : list)
-	{
-		cout << i << tab;
-	}
-	cout << endl;
-
-	for (List::ReIterator b = list.r_begin(), e = list.r_end(); b != e; ++b) {
-		int i = *b;
-		cout << i << tab;
-	}
-	list.print();
+	List list1 = { 3, 5, 8, 13, 21 };
+	for (int i : list1) cout << i << endl;
+	List list2 = { 34, 55, 88};
+	for (int i : list2) cout << i << endl;
+	List list3 = list1 + list2;
+	for (int i : list3) cout << i << endl;
 }
