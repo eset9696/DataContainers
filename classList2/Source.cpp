@@ -6,8 +6,8 @@ using namespace std;
 
 class List;
 class Element;
-class Iterator;
-class ReIterator;
+class ConstIterator;
+class ConstReIterator;
 
 class List
 {
@@ -26,33 +26,31 @@ class List
 			cout << "EDestructor:\t" << this << endl;
 		}
 		friend class List;
-		friend class Iterator;
-		friend class ReIterator;
 	} *Head, *Tail;
 	unsigned int size;
 
 public:
-	class BaseIterator
+	class ConstBaseIterator
 	{
 	protected:
 		Element* Temp;
 	public:
-		BaseIterator(Element* Temp) : Temp(Temp)
+		ConstBaseIterator(Element* Temp) : Temp(Temp)
 		{
 			cout << "BaseIterator constructor" << this << endl;
 		}
 
-		~BaseIterator()
+		~ConstBaseIterator()
 		{
 			cout << "BaseIterator destructor" << this << endl;
 		}
 
-		bool operator==(const BaseIterator& other) const
+		bool operator==(const ConstBaseIterator& other) const
 		{
 			return this->Temp == other.Temp;
 		}
 
-		bool operator!=(const BaseIterator& other) const
+		bool operator!=(const ConstBaseIterator& other) const
 		{
 			return this->Temp != other.Temp;
 		}
@@ -63,10 +61,10 @@ public:
 		}
 	};
 
-	class ConstIterator : public BaseIterator
+	class ConstIterator : public ConstBaseIterator
 	{
 	public:
-		ConstIterator(Element* Temp = nullptr) : BaseIterator(Temp)
+		ConstIterator(Element* Temp = nullptr) : ConstBaseIterator(Temp)
 		{
 			cout << "ItConstructor:\t" << this << endl;
 		}
@@ -102,10 +100,10 @@ public:
 		}
 	};
 
-	class ConstReIterator: BaseIterator
+	class ConstReIterator: public ConstBaseIterator
 	{
 	public:
-		ConstReIterator(Element* Temp = nullptr) : BaseIterator(Temp)
+		ConstReIterator(Element* Temp = nullptr) : ConstBaseIterator(Temp)
 		{
 			cout << "ReItConstructor:\t" << this << endl;
 		}
@@ -141,6 +139,28 @@ public:
 		}
 	};
 
+	class Iterator : public ConstIterator
+	{
+	public:
+		Iterator(Element* Temp = nullptr) : ConstIterator(Temp) {}
+
+		int& operator*()
+		{
+			return Temp->Data;
+		}
+	};
+
+	class ReIterator : public ConstReIterator
+	{
+	public:
+		ReIterator(Element* Temp = nullptr) : ConstReIterator(Temp) {}
+
+		int& operator*()
+		{
+			return Temp->Data;
+		}
+	};
+
 	List()
 	{
 		Head = Tail = nullptr;
@@ -173,22 +193,42 @@ public:
 
 	//Itarators & ReIterators begin() & end()
 
-	const ConstIterator begin() const
+	ConstIterator cbegin() const
 	{
 		return Head;
 	}
 
-	const ConstIterator end() const
+	ConstIterator cend() const
 	{
 		return nullptr;
 	}
 
-	const ConstReIterator r_begin() const
+	ConstReIterator crbegin() const
 	{
 		return Tail;
 	}
 
-	const ConstReIterator r_end() const
+	ConstReIterator crend() const
+	{
+		return nullptr;
+	}
+
+	Iterator begin()
+	{
+		return Head;
+	}
+
+	Iterator end()
+	{
+		return nullptr;
+	}
+
+	ReIterator rbegin()
+	{
+		return Tail;
+	}
+
+	ReIterator rend()
 	{
 		return nullptr;
 	}
@@ -308,14 +348,11 @@ public:
 		cout << "L move assignment:\t" << this << endl;
 		return *this;
 	}
-
-	friend class Iterator;
-	friend class ReIterator;
 };
 List operator+(const List& left, const List& right)
 {
 	List cat = left;
-	for (List::ConstIterator it = right.begin(); it != right.end(); ++it) cat.push_back(*it);
+	for (List::ConstIterator it = right.cbegin(); it != right.cend(); ++it) cat.push_back(*it);
 	return cat;
 }
 
@@ -355,16 +392,22 @@ void main()
 	//}
 	//cout << endl;
 
-	//for (List::ReIterator b = list.r_begin(), e = list.r_end(); b != e; ++b) {
+	//for (List::ReIterator b = list.rbegin(), e = list.rend(); b != e; ++b) {
 	//	int i = *b;
 	//	cout << i << tab;
 	//}
 	//list.print();
 
 	List list1 = { 3, 5, 8, 13, 21 };
-	for (int i : list1) cout << i << endl;
+	for (int i : list1) cout << i << tab;
+
+	for (List::Iterator it = list1.begin(); it != list1.end(); ++it)
+	{
+		*it *= 10;
+		cout << *it << tab;
+	}
 	List list2 = { 34, 55, 88};
-	for (int i : list2) cout << i << endl;
+	for (int i : list2) cout << i << tab;
 	List list3 = list1 + list2;
-	for (int i : list3) cout << i << endl;
+	for (int i : list3) cout << i << tab;
 }
