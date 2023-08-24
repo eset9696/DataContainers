@@ -231,7 +231,7 @@ template <class T> ForwardList<T> operator+(const ForwardList<T>& left, const Fo
 //#define BASE_CHECK
 //#define OPERATOR_PLUS_CHECK
 //#define RANGE_BASED_FOR_ARRAY
-#define RANGE_BASED_FOR_LIST
+//#define RANGE_BASED_FOR_LIST
 //#define MOVE_SEMANTIC_CHECK
 void main()
 {
