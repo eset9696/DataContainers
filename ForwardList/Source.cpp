@@ -9,7 +9,7 @@ ForwardList operator+(const ForwardList& left, const ForwardList& right);
 class Element
 {
 	int Data; //данные
-	Element* pNext; // указатель на следующий элемент
+	Element* pNext; 
 
 public:
 	Element(int Data, Element* pNext = nullptr) :Data(Data), pNext(pNext)
