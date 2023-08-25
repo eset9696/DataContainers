@@ -6,7 +6,7 @@ template <typename T> class Element;
 template <typename T> class ForwardList;
 template <typename T> ForwardList<T> operator+(const ForwardList<T>& left, const ForwardList<T>& right);
 #define delimeter "\n-----------------------------\n"
-//#define DEBUG
+#define DEBUG
 template <typename T> class Element
 {
 	T Data; //данные
