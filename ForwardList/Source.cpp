@@ -6,6 +6,7 @@ template <typename T> class Element;
 template <typename T> class ForwardList;
 template <typename T> ForwardList<T> operator+(const ForwardList<T>& left, const ForwardList<T>& right);
 #define delimeter "\n-----------------------------\n"
+//#define DEBUG
 template <typename T> class Element
 {
 	T Data; //данные
@@ -14,12 +15,18 @@ template <typename T> class Element
 public:
 	Element(T Data, Element<T>* pNext = nullptr) :Data(Data), pNext(pNext)
 	{
+#ifdef DEBUG
 		cout << "Element constructor\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	~Element()
 	{
+#ifdef DEBUG
 		cout << "Element destructor\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	friend class ForwardList<T>;
@@ -34,12 +41,16 @@ template <typename T> class Iterator
 public:
 	Iterator(Element<T>* Temp = nullptr) :Temp(Temp)
 	{
+#ifdef DEBUG
 		cout << "Iterator constructor:\t" << this << endl;
+#endif // DEBUG
 	}
 
 	~Iterator()
 	{
+#ifdef DEBUG
 		cout << "Iterator destructor:\t" << this << endl;
+#endif // DEBUG
 	}
 
 	Iterator<T>& operator++()
@@ -73,7 +84,9 @@ public:
 	ForwardList()
 	{
 		Head = nullptr; // если список пуст, то его голова указывает на ноль
+#ifdef DEBUG
 		cout << "FList constructor\t" << this << endl;
+#endif // DEBUG
 	}
 
 	ForwardList(const std::initializer_list<T>& il): ForwardList()
@@ -86,7 +99,10 @@ public:
 		{
 			push_back(*it);
 		}
+#ifdef DEBUG
 		cout << "FList move constructor\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	ForwardList(const ForwardList<T>& other) :ForwardList()
@@ -94,19 +110,28 @@ public:
 		/*for (Element* Temp = other.Head; Temp; Temp = Temp->pNext)
 			push_back(Temp->Data);*/
 		*this = other;
+#ifdef DEBUG
 		cout << "FList copy constructor\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	ForwardList(ForwardList<T>&& other) noexcept :ForwardList()
 	{
 		*this = std::move(other); // функция move() принудительно вызывает MoveAssignment для объекта
+#ifdef DEBUG
 		cout << "FList move constructor\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	~ForwardList()
 	{
 		while (Head) pop_front();
-		cout << "FList destructor\t" << this << endl;
+#ifdef DEBUG
+		cout << "FList destructor\t" << this << endl; 
+#endif // DEBUG
+
 	}
 
 	ForwardList<T>& operator=(const ForwardList<T>& other)
@@ -115,7 +140,10 @@ public:
 		while (Head)pop_front();
 		for (Element<T>* Temp = other.Head; Temp; Temp = Temp->pNext)
 			push_back(Temp->Data);
+#ifdef DEBUG
 		cout << "FList copy assignment\t" << this << endl;
+#endif // DEBUG
+
 		return *this;
 	}
 
@@ -125,7 +153,10 @@ public:
 		while (Head)pop_front();
 		this->Head = other.Head;
 		other.Head = nullptr;
+#ifdef DEBUG
 		cout << "FList move assignment\t" << this << endl;
+#endif // DEBUG
+
 		return *this;
 	}
 	
