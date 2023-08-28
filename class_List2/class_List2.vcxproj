@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{03e8c976-0e77-42b7-9867-719ff29f0c8f}</ProjectGuid>
+    <ProjectGuid>{c39263f3-d17f-43fd-80e6-ca6b82d2acd2}</ProjectGuid>
     <RootNamespace>classList2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -127,11 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source Files\List2.cpp" />
-    <ClCompile Include="Source Files\Source.cpp" />
+    <ClCompile Include="List2.cpp" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header Files\List2.h" />
+    <ClInclude Include="List2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
