@@ -24,8 +24,7 @@ template <typename T> class List
 	unsigned int size;
 
 public:
-	//									Base Iterator methods								 //
-	///////////////////////////////////////////////////////////////////////////////////////////
+
 	class ConstBaseIterator
 	{
 	protected:
@@ -41,9 +40,7 @@ public:
 
 		const T& operator*() const;
 	};
-	///-------------------------------------------------------------------------------------///
-	//										Iterator methods								 //
-	///////////////////////////////////////////////////////////////////////////////////////////
+
 	class ConstIterator : public ConstBaseIterator
 	{
 	public:
@@ -59,6 +56,7 @@ public:
 
 		ConstIterator operator--(int);
 	};
+
 	class Iterator : public ConstIterator
 	{
 	public:
@@ -66,9 +64,7 @@ public:
 
 		T& operator*();
 	};
-	///------------------------------------------------------------------------------------///
-	//									Reverse Iterator methods							//
-	//////////////////////////////////////////////////////////////////////////////////////////
+
 	class ConstReIterator: public ConstBaseIterator
 	{
 	public:
@@ -83,6 +79,7 @@ public:
 
 		ConstReIterator operator--(int);
 	};
+
 	class ReIterator : public ConstReIterator
 	{
 	public:
@@ -90,9 +87,6 @@ public:
 
 		T& operator*();
 	};
-	///------------------------------------------------------------------------------------///
-	//										 List methods                                   //
-	//////////////////////////////////////////////////////////////////////////////////////////
 
 	List();
 	List(const initializer_list<T> il);
