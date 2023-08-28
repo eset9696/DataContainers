@@ -43,6 +43,8 @@ void main()
 	//}
 	//list.print();
 
+	cout << "List2 separated" << endl;
+
 	List<int> list1 = { 3, 5, 8, 13, 21 };
 	for (int i : list1) cout << i << tab;
 

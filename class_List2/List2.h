@@ -9,6 +9,7 @@ template <typename T> class List;
 class Element;
 class ConstIterator;
 class ConstReIterator;
+template <typename T> List<T> operator+(const List<T>& left, const List<T>& right);
 
 template <typename T> class List
 {
