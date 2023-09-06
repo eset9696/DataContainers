@@ -1,6 +1,10 @@
 #include <iostream>
+#include <ctime>
 
 using namespace std;
+using std::cin;
+using std::cout;
+using std::endl;
 
 class Tree
 {
@@ -13,47 +17,24 @@ protected:
 	public:
 		Element(int Data, Element* pLeft = nullptr, Element* pRight = nullptr) : Data(Data), pLeft(pLeft), pRight(pRight)
 		{
+#ifdef DEBUG
 			cout << "Element constructor:\t" << this << endl;
+#endif // DEBUG
+
 		}
 		~Element()
 		{
+#ifdef DEBUG
 			cout << "Element destructor:\t" << this << endl;
+#endif // DEBUG
+
 		}
 		friend class Tree;
 		friend class UniqueTree;
-		friend class Iterator;
-	}*Root, *Temp;
-	//class BaseIterator
-	//{
-	//	Element* Temp;
-	//public:
-	//	BaseIterator(Element* Temp = nullptr): Temp(Temp)
-	//	{
-	//		cout << "BIterator constructor:\t" << this << endl;
-	//	}
-	//	~BaseIterator()
-	//	{
-	//		cout << "Iterator destructor:\t" << this << endl;
-	//	}
-	//	BaseIterator& operator++()
-	//	{
-	//		Temp = Temp->pRight;
-	//		return *this;
-	//	}
-	//	bool operator==(const BaseIterator& other)
-	//	{
-	//		return this->Temp == other.Temp;
-	//	}
-	//	bool operator!=(const BaseIterator& other)
-	//	{
-	//		return this->Temp != other.Temp;
-	//	}
-	//	int operator*()
-	//	{
-	//		return Temp->Data;
-	//	}
-	//	friend class Tree;
-	//};
+	}*Root;
+
+
+	
 
 public:
 	Element* getRoot()
@@ -61,147 +42,171 @@ public:
 		return this->Root;
 	}
 
-	//BaseIterator begin()
-	//{
-	//	return Root;
-	//}
-
-	//BaseIterator end()
-	//{
-	//	return nullptr;
-	//}
-
 	Tree(): Root(nullptr)
 	{
+#ifdef DEBUG
 		cout << "Three constructor:\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	Tree(initializer_list<int> il) : Tree()
 	{
-		for (const int* it = il.begin(); it != il.end(); it++) insert(*it);
+		for (int i : il) insert(i, Root);
+#ifdef DEBUG
 		cout << "Tree il constructor:\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	~Tree()
 	{
-
+		Clear();
+#ifdef DEBUG
 		cout << "Tree destructor:\t" << this << endl;
+#endif // DEBUG
+
 	}
 
 	void insert(int Data)
 	{
-		if (this->Root == nullptr)
+		insert(Data, Root);
+	}
+
+	int minValue() const
+	{
+		return minValue(Root);
+	}
+
+	int maxValue() const
+	{
+		return maxValue(Root);
+	}
+
+	int Sum() const
+	{
+		return Sum(Root);
+	}
+
+	int Count() const
+	{
+		return Count(Root);
+	}
+
+	double Avg() const
+	{
+		return Avg(Root);
+	}
+
+	void print()const
+	{
+		print(Root);
+		cout << endl;
+	}
+
+	void Clear()
+	{
+		Clear(Root);
+		Root = nullptr;
+	}
+
+	int Depth() const
+	{
+		return Depth(Root);
+	}
+
+	void Measure(clock_t& start, const char* name)
+	{
+		clock_t point = clock();
+		cout << name << " work time: " << double(point - start) / CLOCKS_PER_SEC << " sec." << endl;
+		start = clock();
+	}
+	
+private:
+	void insert(int Data, Element* Root)
+	{
+		if (this->Root == nullptr) this->Root = new Element(Data);
+		if (Root == nullptr) return;
+		if(Data < Root->Data)
 		{
-			this->Root = new Element(Data);
-			Temp = this->Root;
-			return;
-		}
-		if (Temp == nullptr) return;
-		if(Data < Temp->Data)
-		{
-			if (Temp->pLeft == nullptr)Temp->pLeft = new Element(Data), Temp = this->Root;
-			else Temp = Temp->pLeft, insert(Data);
+			if (Root->pLeft == nullptr)Root->pLeft = new Element(Data);
+			else insert(Data, Root->pLeft);
 		}
 		else
 		{
-			if (Temp->pRight == nullptr) Temp->pRight = new Element(Data), Temp = this->Root;
-			else Temp = Temp->pRight, insert(Data);
+			if (Root->pRight == nullptr) Root->pRight = new Element(Data);
+			else insert(Data, Root->pRight);
 		}
 	}
 
-	/*void erase(int Data)
+	int minValue(Element* Root) const
 	{
-		if (this->Root == nullptr)
-		{
-			return;
-		}
-		if (Data < Iterator->Data)
-		{
-			if (Iterator->pLeft == nullptr) return;
-			else Iterator = Iterator->pLeft, erase(Data);
-		}
-		else if (Data > Iterator->Data)
-		{
-			if (Iterator->pRight == nullptr) return;
-			else Iterator = Iterator->pRight, erase(Data);
-		}
-		else
-		{
-			delete Iterator;
-			Iterator = this->Root;
-			return;
-		}
-	}*/
-
-	int minValue()
-	{
-		int min;
-		if (Temp == nullptr) return 0;
-		if(Temp->pLeft == nullptr) 
-		{
-			min = Temp->Data;
-			Temp = this->Root;
-			return min;
-		}
-		else
-		{
-			Temp = Temp->pLeft;
-			return minValue();
-		}
+		if (this->Root == nullptr) return 0;
+		return Root->pLeft == nullptr ? Root->Data : minValue(Root->pLeft);
 	}
 
-	int maxValue()
+	int maxValue(Element* Root) const
 	{
-		int max;
-		if (Temp == nullptr) return 0;
-		if (Temp->pRight == nullptr)
-		{
-			max = Temp->Data;
-			Temp = this->Root;
-			return max;
-		}
-		else
-		{
-			Temp = Temp->pRight;
-			return maxValue();
-		}
+		if (this->Root == nullptr) return 0;
+		return Root->pRight == nullptr ? Root->Data: maxValue(Root->pRight);
 	}
 
-	int Sum()
+	int Sum(Element* Root) const
 	{
-		int sum = 0;
-		if (Temp == nullptr) return sum;
-		else
-		{
-			Temp->pLeft;
-			sum += Sum();
-			Temp->pRight;
-			sum += Sum();
-			sum += Temp->Data;
-			Temp = this->Root;
-			return sum;
-		}
-		//return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
+		if (this->Root == nullptr) return 0;
+		return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
 	}
 
-	int Count(Element* Root)
+	int Count(Element* Root) const
 	{
 		return Root == nullptr ? 0 : Count(Root->pLeft) + Count(Root->pRight) + 1;
 	}
 
-	double Avg(Element* Root)
+	double Avg(Element* Root) const
 	{
 		return (double)Sum() / Count(Root);
 	}
 
-	void print(Element* Root)
+	void print(Element* Root) const
 	{
 		if (Root == nullptr) return;
 		print(Root->pLeft);
 		cout << Root->Data << "\t";
 		print(Root->pRight);
 	}
-	friend class Iterator;
+
+	void Clear(Element* Root)
+	{
+		if (Root == nullptr) return;
+		Clear(Root->pLeft);
+		Clear(Root->pRight);
+		delete Root;
+	}
+
+	/*void Erase(int Data, Element* Root)
+	{
+		if (Root == nullptr) return;
+		Erase(Data, Root->pLeft);
+		if(Root->pLeft->Data == Data)
+		{
+			Element* Erased = Root->pLeft;
+			Root->pLeft->pRight->pLeft = Root->pLeft->pLeft;
+			Root->pLeft = Root->pLeft->pRight;
+		}
+		Erase(Data, Root->pRight);
+		delete Root;
+	}*/
+
+	int Depth(Element* Root) const
+	{
+		if (Root == nullptr) return 0;
+		int l_depth = Depth(Root->pLeft) + 1;
+		int r_depth = Depth(Root->pRight) + 1;
+		return l_depth < r_depth ? r_depth : l_depth;
+	}
+
+	
+
 };
 
 class UniqueTree: public Tree
@@ -209,22 +214,22 @@ class UniqueTree: public Tree
 public:
 	void insert(int Data)
 	{
-		if (this->Root == nullptr)
+		insert(Data, Root);
+	}
+private:
+	void insert(int Data, Element* Root)
+	{
+		if (this->Root == nullptr) this->Root = new Element(Data);
+		if (Root == nullptr) return;
+		if (Data < Root->Data)
 		{
-			this->Root = new Element(Data);
-			Temp = this->Root;
-			return;
+			if (Root->pLeft == nullptr)Root->pLeft = new Element(Data);
+			else insert(Data, Root->pLeft);
 		}
-		if (Temp == nullptr) return;
-		if (Data < Temp->Data)
+		else if (Data > Root->Data)
 		{
-			if (Temp->pLeft == nullptr)Temp->pLeft = new Element(Data), Temp = this->Root;
-			else Temp = Temp->pLeft, insert(Data);
-		}
-		else
-		{
-			if (Temp->pRight == nullptr) Temp->pRight = new Element(Data), Temp = this->Root;
-			else Temp = Temp->pRight, insert(Data);
+			if (Root->pRight == nullptr) Root->pRight = new Element(Data);
+			else insert(Data, Root->pRight);
 		}
 	}
 };
@@ -232,46 +237,100 @@ public:
 
 #define BASE_CHECK
 //#define RANGE_BASED_FOR_TREE_CHECK
+//#define DEPTH_CHECK
 void main()
 {
 	setlocale(LC_ALL, "");
 #ifdef BASE_CHECK
 	int n;
 	cout << "Enter tree size:\n"; cin >> n;
+
 	Tree tree;
+	clock_t start = clock();
 	for (int i = 0; i < n; i++)
 	{
-		int num = rand() % 100;
-		cout << num << "\t";
-		tree.insert(num);
+		tree.insert(rand() % 100);
 	}
-	tree.print(tree.getRoot());
-	cout << endl;
-	cout << "Min value in tree:\t" << tree.minValue() << endl;
-	cout << "Max value in tree:\t" << tree.maxValue() << endl;
-	cout << "Sum of tree elements:\t" << tree.Sum() << endl;
-	cout << "Number of tree elements:\t" << tree.Count(tree.getRoot()) << endl;
-	cout << "Arithmetic mean of tree elements:\t" << tree.Avg(tree.getRoot()) << endl;
+	tree.Measure(start, "insert");
+	clock_t end = clock();
+	cout << "insert time:\t" << double(end - start)/CLOCKS_PER_SEC << endl;
+	//tree.print();
+
+	cout << "Min value in tree:\t" << endl;
+	start = clock();
+	int min = tree.minValue();
+	end = clock();
+	cout << min << endl;
+	cout << "min time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+	///////////////////////////////////////
+	cout << "Max value in tree:\t";
+	start = clock();
+	int max = tree.maxValue();
+	end = clock();
+	cout << max << endl;
+	cout << "max time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+	///////////////////////////////////
+	cout << "Sum of tree elements:\t";
+	start = clock();
+	int sum = tree.Sum();
+	end = clock();
+	cout << sum << endl;
+	cout << "Sum time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+	///////////////////////////
+	cout << "Number of tree elements:\t";
+	start = clock();
+	int num = tree.Count();
+	end = clock();
+	cout << num << endl;
+	cout << "Count time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+	//////////////////////////////////////////
+	cout << "Arithmetic mean of tree elements:\t";
+	start = clock();
+	double avg = tree.Avg();
+	end = clock();
+	cout << avg << endl;
+	cout << "Avg time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+	//////////////////////////////////////////
+	cout << "Depth of tree:\t";
+	start = clock();
+	int depth = tree.Depth();
+	end = clock();
+	cout << depth << endl;
+	cout << "Depth time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+
 
 	UniqueTree u_tree;
+	start = clock();
 	for (int i = 0; i < n; i++)
 	{
 		u_tree.insert(rand() % 100);
 	}
-	u_tree.print(u_tree.getRoot());
-	cout << endl;
+	u_tree.Measure(start, "insert()");
+	//u_tree.print();
 	cout << "Min value in unique tree:\t" << u_tree.minValue() << endl;
+	u_tree.Measure(start, "minValue()");
 	cout << "Max value in unique tree:\t" << u_tree.maxValue() << endl;
+	u_tree.Measure(start, "maxValue()");
 	cout << "Sum of unique tree elements:\t" << u_tree.Sum() << endl;
-	cout << "Number of unique tree elements:\t" << u_tree.Count(u_tree.getRoot()) << endl;
-	cout << "Arithmetic mean of unique tree elements:\t" << u_tree.Avg(u_tree.getRoot()) << endl;
+	u_tree.Measure(start, "Sum()");
+	cout << "Number of unique tree elements:\t" << u_tree.Count() << endl;
+	u_tree.Measure(start, "Count()");
+	cout << "Arithmetic mean of unique tree elements:\t" << u_tree.Avg() << endl;
+	u_tree.Measure(start, "Avg()");
+	cout << "Depth of tree:\t" << u_tree.Depth() << endl;
+	u_tree.Measure(start, "Depth()");
+
 #endif // BASE_CHECK
 
 #ifdef RANGE_BASED_FOR_TREE_CHECK
-	Tree tree = {10, 12, 9, 3, 4, 56};
-	tree.print(tree.getRoot());
-	tree.erase(10);
-	tree.print(tree.getRoot());
+	Tree tree = {0, 1, 1, 2, 3, 5};
+	tree.print();
 #endif // RANGE_BASED_FOR_TREE_CHECK
+
+#ifdef DEPTH_CHECK
+	Tree tree = { 50, 25, 75, 16, 32, 64, 90 };
+	tree.print();
+	cout << "Depth of tree:\t" << tree.Depth() << endl;
+#endif // DEPTH_CHECK
 
 }
