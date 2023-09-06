@@ -33,9 +33,6 @@ protected:
 		friend class UniqueTree;
 	}*Root;
 
-
-	
-
 public:
 	Element* getRoot()
 	{
@@ -115,6 +112,11 @@ public:
 		return Depth(Root);
 	}
 
+	void Erase(int Data) 
+	{
+		Erase(Data, Root);
+	}
+
 	void Measure(clock_t& start, const char* name)
 	{
 		clock_t point = clock();
@@ -183,19 +185,45 @@ private:
 		delete Root;
 	}
 
-	/*void Erase(int Data, Element* Root)
+	void ins(Element* Root)
 	{
 		if (Root == nullptr) return;
+		insert(Root->Data);
+		ins(Root->pLeft);
+		ins(Root->pRight);
+	}
+
+	void Erase(int Data, Element* Root)
+	{
+		if (Root == nullptr) return;
+		if (Root->Data == Data) return;
 		Erase(Data, Root->pLeft);
-		if(Root->pLeft->Data == Data)
+		if (Root->pLeft != nullptr)
 		{
-			Element* Erased = Root->pLeft;
-			Root->pLeft->pRight->pLeft = Root->pLeft->pLeft;
-			Root->pLeft = Root->pLeft->pRight;
+			if (Root->pLeft->Data == Data)
+			{
+				Element* Erased = Root->pLeft;
+				Root->pLeft = Root->pLeft->pRight;
+				ins(Erased->pLeft);
+				Clear(Erased->pLeft);
+				delete Erased;
+			}
+			else return;
 		}
 		Erase(Data, Root->pRight);
-		delete Root;
-	}*/
+		if (Root->pRight != nullptr) 
+		{
+			if (Root->pRight->Data == Data)
+			{
+				Element* Erased = Root->pRight;
+				Root->pRight = Root->pRight->pRight;
+				ins(Erased->pRight);
+				Clear(Erased->pRight);
+				delete Erased;
+			}
+			else return;
+		}
+	}
 
 	int Depth(Element* Root) const
 	{
@@ -204,8 +232,6 @@ private:
 		int r_depth = Depth(Root->pRight) + 1;
 		return l_depth < r_depth ? r_depth : l_depth;
 	}
-
-	
 
 };
 
@@ -235,8 +261,8 @@ private:
 };
 
 
-#define BASE_CHECK
-//#define RANGE_BASED_FOR_TREE_CHECK
+//#define BASE_CHECK
+#define RANGE_BASED_FOR_TREE_CHECK
 //#define DEPTH_CHECK
 void main()
 {
@@ -323,7 +349,10 @@ void main()
 #endif // BASE_CHECK
 
 #ifdef RANGE_BASED_FOR_TREE_CHECK
-	Tree tree = {0, 1, 1, 2, 3, 5};
+	//Tree tree = {0, 1, 1, 2, 3, 5};
+	Tree tree = {10, 20, 5, 6, 3, 15};
+	tree.print();
+	tree.Erase(5);
 	tree.print();
 #endif // RANGE_BASED_FOR_TREE_CHECK
 
