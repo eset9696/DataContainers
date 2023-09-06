@@ -116,13 +116,6 @@ public:
 	{
 		Erase(Data, Root);
 	}
-
-	void Measure(clock_t& start, const char* name)
-	{
-		clock_t point = clock();
-		cout << name << " work time: " << double(point - start) / CLOCKS_PER_SEC << " sec." << endl;
-		start = clock();
-	}
 	
 private:
 	void insert(int Data, Element* Root)
@@ -185,52 +178,31 @@ private:
 		delete Root;
 	}
 
-	void ins(Element* Root)
+	void Erase(int Data, Element*& Root)
 	{
 		if (Root == nullptr) return;
-		insert(Root->Data);
-		ins(Root->pLeft);
-		ins(Root->pRight);
-	}
-
-	void Erase(int Data, Element* Root)
-	{
-		if (Root == nullptr) return;
-		if (Data == this->Root->Data)
-		{
-			Element* Erased = this->Root;
-			this->Root = this->Root->pRight;
-			ins(Erased->pLeft);
-			Clear(Erased->pLeft);
-			delete Erased;
-			return;
-		}
-		if (Root->Data == Data) return;
 		Erase(Data, Root->pLeft);
-		if (Root->pLeft != nullptr)
-		{
-			if (Root->pLeft->Data == Data)
-			{
-				Element* Erased = Root->pLeft;
-				Root->pLeft = Root->pLeft->pRight;
-				ins(Erased->pLeft);
-				Clear(Erased->pLeft);
-				delete Erased;
-			}
-			else return;
-		}
 		Erase(Data, Root->pRight);
-		if (Root->pRight != nullptr) 
+		if (Data == Root->Data)
 		{
-			if (Root->pRight->Data == Data)
+			if(Root->pLeft == Root->pRight)
 			{
-				Element* Erased = Root->pRight;
-				Root->pRight = Root->pRight->pRight;
-				ins(Erased->pRight);
-				Clear(Erased->pRight);
-				delete Erased;
+				delete Root;
+				Root = nullptr;
 			}
-			else return;
+			else
+			{
+				if (Count(Root->pLeft) > Count(Root->pRight))
+				{
+					Root->Data = maxValue(Root->pLeft);
+					Erase(maxValue(Root->pLeft), Root->pLeft);
+				}
+				else
+				{
+					Root->Data = minValue(Root->pRight);
+					Erase(minValue(Root->pRight), Root->pRight);
+				}
+			}
 		}
 	}
 
@@ -268,10 +240,20 @@ private:
 		}
 	}
 };
+template <typename T>
+void Measure(const char* message, const Tree& tree, T (Tree::*member_function)() const)
+{
+	cout << message;
+	clock_t start = clock();
+	T value = (tree.*member_function)();
+	clock_t end = clock();
+	cout << value << endl;
+	cout << "Completed in:  " << double(end - start) / CLOCKS_PER_SEC << " sec." << endl;
+}
 
-
-#define BASE_CHECK
-//#define RANGE_BASED_FOR_TREE_CHECK
+//#define BASE_CHECK
+//#define OLD_PERFORMANCE_CHECK
+#define RANGE_BASED_FOR_TREE_CHECK
 //#define DEPTH_CHECK
 void main()
 {
@@ -287,9 +269,10 @@ void main()
 	{
 		tree.insert(rand() % 100);
 	}
-	tree.Measure(start1, "insert");
+#ifdef OLD_PERFORMANCE_CHECK
+	//Measure("insert", tree, &Tree::insert);
 	clock_t end = clock();
-	cout << "insert time:\t" << double(end - start)/CLOCKS_PER_SEC << endl;
+	cout << "insert time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	//tree.print();
 
 	cout << "Min value in tree:\t" << endl;
@@ -297,7 +280,6 @@ void main()
 	int min = tree.minValue();
 	end = clock();
 	cout << min << endl;
-	tree.Measure(start1, "minValue()");
 	cout << "min time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	///////////////////////////////////////
 	cout << "Max value in tree:\t";
@@ -305,7 +287,6 @@ void main()
 	int max = tree.maxValue();
 	end = clock();
 	cout << max << endl;
-	tree.Measure(start1, "maxValue()");
 	cout << "max time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	///////////////////////////////////
 	cout << "Sum of tree elements:\t";
@@ -313,7 +294,6 @@ void main()
 	int sum = tree.Sum();
 	end = clock();
 	cout << sum << endl;
-	tree.Measure(start1, "Sum()");
 	cout << "Sum time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	///////////////////////////
 	cout << "Number of tree elements:\t";
@@ -321,7 +301,6 @@ void main()
 	int num = tree.Count();
 	end = clock();
 	cout << num << endl;
-	tree.Measure(start1, "Count()");
 	cout << "Count time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	//////////////////////////////////////////
 	cout << "Arithmetic mean of tree elements:\t";
@@ -329,7 +308,6 @@ void main()
 	double avg = tree.Avg();
 	end = clock();
 	cout << avg << endl;
-	tree.Measure(start1, "Avg()");
 	cout << "Avg time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	//////////////////////////////////////////
 	cout << "Depth of tree:\t";
@@ -337,30 +315,29 @@ void main()
 	int depth = tree.Depth();
 	end = clock();
 	cout << depth << endl;
-	tree.Measure(start1, "Depth()");
 	cout << "Depth time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
+#endif // OLD_PERFORMANCE_CHECK
+	Measure("Min value in tree: ", tree, &Tree::minValue);
+	Measure("Max value in tree: ", tree, &Tree::maxValue);
+	Measure("Sum of tree elements: ", tree, &Tree::Sum);
+	Measure("Number of tree elements: ", tree, &Tree::Count);
+	Measure("Avg value of tree elements: ", tree, &Tree::Avg);
+	Measure("Depth of tree: ", tree, &Tree::Depth);
 
+	cout << "==================================== Unique Tree ====================================" << endl;
 
 	UniqueTree u_tree;
-	start1 = clock();
 	for (int i = 0; i < n; i++)
 	{
 		u_tree.insert(rand() % 100);
 	}
-	u_tree.Measure(start1, "insert()");
 	//u_tree.print();
 	cout << "Min value in unique tree:\t" << u_tree.minValue() << endl;
-	u_tree.Measure(start, "minValue()");
 	cout << "Max value in unique tree:\t" << u_tree.maxValue() << endl;
-	u_tree.Measure(start, "maxValue()");
 	cout << "Sum of unique tree elements:\t" << u_tree.Sum() << endl;
-	u_tree.Measure(start, "Sum()");
 	cout << "Number of unique tree elements:\t" << u_tree.Count() << endl;
-	u_tree.Measure(start, "Count()");
 	cout << "Arithmetic mean of unique tree elements:\t" << u_tree.Avg() << endl;
-	u_tree.Measure(start, "Avg()");
 	cout << "Depth of tree:\t" << u_tree.Depth() << endl;
-	u_tree.Measure(start, "Depth()");
 
 #endif // BASE_CHECK
 
@@ -377,5 +354,6 @@ void main()
 	tree.print();
 	cout << "Depth of tree:\t" << tree.Depth() << endl;
 #endif // DEPTH_CHECK
+
 
 }
