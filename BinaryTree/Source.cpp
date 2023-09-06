@@ -196,6 +196,15 @@ private:
 	void Erase(int Data, Element* Root)
 	{
 		if (Root == nullptr) return;
+		if (Data == this->Root->Data)
+		{
+			Element* Erased = this->Root;
+			this->Root = this->Root->pRight;
+			ins(Erased->pLeft);
+			Clear(Erased->pLeft);
+			delete Erased;
+			return;
+		}
 		if (Root->Data == Data) return;
 		Erase(Data, Root->pLeft);
 		if (Root->pLeft != nullptr)
@@ -350,9 +359,9 @@ void main()
 
 #ifdef RANGE_BASED_FOR_TREE_CHECK
 	//Tree tree = {0, 1, 1, 2, 3, 5};
-	Tree tree = {10, 20, 5, 6, 3, 15};
+	Tree tree = {10, 20, 5, 6, 3, 15, 2, 4, 1};
 	tree.print();
-	tree.Erase(5);
+	tree.Erase(10);
 	tree.print();
 #endif // RANGE_BASED_FOR_TREE_CHECK
 
