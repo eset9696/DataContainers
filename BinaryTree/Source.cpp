@@ -270,8 +270,8 @@ private:
 };
 
 
-//#define BASE_CHECK
-#define RANGE_BASED_FOR_TREE_CHECK
+#define BASE_CHECK
+//#define RANGE_BASED_FOR_TREE_CHECK
 //#define DEPTH_CHECK
 void main()
 {
@@ -281,12 +281,13 @@ void main()
 	cout << "Enter tree size:\n"; cin >> n;
 
 	Tree tree;
+	clock_t start1 = clock();
 	clock_t start = clock();
 	for (int i = 0; i < n; i++)
 	{
 		tree.insert(rand() % 100);
 	}
-	tree.Measure(start, "insert");
+	tree.Measure(start1, "insert");
 	clock_t end = clock();
 	cout << "insert time:\t" << double(end - start)/CLOCKS_PER_SEC << endl;
 	//tree.print();
@@ -296,6 +297,7 @@ void main()
 	int min = tree.minValue();
 	end = clock();
 	cout << min << endl;
+	tree.Measure(start1, "minValue()");
 	cout << "min time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	///////////////////////////////////////
 	cout << "Max value in tree:\t";
@@ -303,6 +305,7 @@ void main()
 	int max = tree.maxValue();
 	end = clock();
 	cout << max << endl;
+	tree.Measure(start1, "maxValue()");
 	cout << "max time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	///////////////////////////////////
 	cout << "Sum of tree elements:\t";
@@ -310,6 +313,7 @@ void main()
 	int sum = tree.Sum();
 	end = clock();
 	cout << sum << endl;
+	tree.Measure(start1, "Sum()");
 	cout << "Sum time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	///////////////////////////
 	cout << "Number of tree elements:\t";
@@ -317,6 +321,7 @@ void main()
 	int num = tree.Count();
 	end = clock();
 	cout << num << endl;
+	tree.Measure(start1, "Count()");
 	cout << "Count time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	//////////////////////////////////////////
 	cout << "Arithmetic mean of tree elements:\t";
@@ -324,6 +329,7 @@ void main()
 	double avg = tree.Avg();
 	end = clock();
 	cout << avg << endl;
+	tree.Measure(start1, "Avg()");
 	cout << "Avg time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 	//////////////////////////////////////////
 	cout << "Depth of tree:\t";
@@ -331,16 +337,17 @@ void main()
 	int depth = tree.Depth();
 	end = clock();
 	cout << depth << endl;
+	tree.Measure(start1, "Depth()");
 	cout << "Depth time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 
 
 	UniqueTree u_tree;
-	start = clock();
+	start1 = clock();
 	for (int i = 0; i < n; i++)
 	{
 		u_tree.insert(rand() % 100);
 	}
-	u_tree.Measure(start, "insert()");
+	u_tree.Measure(start1, "insert()");
 	//u_tree.print();
 	cout << "Min value in unique tree:\t" << u_tree.minValue() << endl;
 	u_tree.Measure(start, "minValue()");
