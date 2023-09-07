@@ -101,6 +101,12 @@ public:
 		cout << endl;
 	}
 
+	void print_tree() const
+	{
+		int Depth = 0;
+		print_tree(Depth, Root);
+	}
+
 	void Clear()
 	{
 		Clear(Root);
@@ -115,6 +121,11 @@ public:
 	void Erase(int Data) 
 	{
 		Erase(Data, Root);
+	}
+
+	void balance()
+	{
+		balance(Root);
 	}
 	
 private:
@@ -131,6 +142,34 @@ private:
 		{
 			if (Root->pRight == nullptr) Root->pRight = new Element(Data);
 			else insert(Data, Root->pRight);
+		}
+	}
+
+	void Erase(int Data, Element*& Root)
+	{
+		if (Root == nullptr) return;
+		Erase(Data, Root->pLeft);
+		Erase(Data, Root->pRight);
+		if (Data == Root->Data)
+		{
+			if (Root->pLeft == Root->pRight)
+			{
+				delete Root;
+				Root = nullptr;
+			}
+			else
+			{
+				if (Count(Root->pLeft) > Count(Root->pRight))
+				{
+					Root->Data = maxValue(Root->pLeft);
+					Erase(maxValue(Root->pLeft), Root->pLeft);
+				}
+				else
+				{
+					Root->Data = minValue(Root->pRight);
+					Erase(minValue(Root->pRight), Root->pRight);
+				}
+			}
 		}
 	}
 
@@ -170,40 +209,39 @@ private:
 		print(Root->pRight);
 	}
 
+	void print_tree(int Depth, Element* Root) const
+	{
+		if (Root == nullptr) return;
+		print_tree(Depth + 1, Root->pLeft);
+		for (int i = 1; i < Depth; i++)
+		{
+			cout << "\t";
+		}
+		if(Root != this->Root)cout << "|-------";
+		cout << Root->Data << endl;
+		print_tree(Depth + 1, Root->pRight);
+	}
+
+	void balance(Element*& Root)
+	{
+		if (abs(Count(Root->pLeft) - Count(Root->pRight)) > 1)
+		{
+			int Data = Root->Data;
+			Erase(Root->Data);
+			insert(Data);
+			balance();
+		}
+		else return;
+		balance(Root->pLeft);
+		balance(Root->pRight);
+	}
+
 	void Clear(Element* Root)
 	{
 		if (Root == nullptr) return;
 		Clear(Root->pLeft);
 		Clear(Root->pRight);
 		delete Root;
-	}
-
-	void Erase(int Data, Element*& Root)
-	{
-		if (Root == nullptr) return;
-		Erase(Data, Root->pLeft);
-		Erase(Data, Root->pRight);
-		if (Data == Root->Data)
-		{
-			if(Root->pLeft == Root->pRight)
-			{
-				delete Root;
-				Root = nullptr;
-			}
-			else
-			{
-				if (Count(Root->pLeft) > Count(Root->pRight))
-				{
-					Root->Data = maxValue(Root->pLeft);
-					Erase(maxValue(Root->pLeft), Root->pLeft);
-				}
-				else
-				{
-					Root->Data = minValue(Root->pRight);
-					Erase(minValue(Root->pRight), Root->pRight);
-				}
-			}
-		}
 	}
 
 	int Depth(Element* Root) const
@@ -317,12 +355,12 @@ void main()
 	cout << depth << endl;
 	cout << "Depth time:\t" << double(end - start) / CLOCKS_PER_SEC << endl;
 #endif // OLD_PERFORMANCE_CHECK
-	Measure("Min value in tree: ", tree, &Tree::minValue);
-	Measure("Max value in tree: ", tree, &Tree::maxValue);
-	Measure("Sum of tree elements: ", tree, &Tree::Sum);
-	Measure("Number of tree elements: ", tree, &Tree::Count);
-	Measure("Avg value of tree elements: ", tree, &Tree::Avg);
-	Measure("Depth of tree: ", tree, &Tree::Depth);
+	Measure<int>("Min value in tree: ", tree, &Tree::minValue);
+	Measure<int>("Max value in tree: ", tree, &Tree::maxValue);
+	Measure<int>("Sum of tree elements: ", tree, &Tree::Sum);
+	Measure<int>("Number of tree elements: ", tree, &Tree::Count);
+	Measure<int>("Avg value of tree elements: ", tree, &Tree::Avg);
+	Measure<int>("Depth of tree: ", tree, &Tree::Depth);
 
 	cout << "==================================== Unique Tree ====================================" << endl;
 
@@ -342,11 +380,15 @@ void main()
 #endif // BASE_CHECK
 
 #ifdef RANGE_BASED_FOR_TREE_CHECK
-	//Tree tree = {0, 1, 1, 2, 3, 5};
+	//Tree tree = { 2000, 1998, 1900, 1800, 1700, 1600, 1500, 1400, 1300, 1200, 1100, 1000, 900, 800 };
+	//Tree tree = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711 };
 	Tree tree = {10, 20, 5, 6, 3, 15, 2, 4, 1};
-	tree.print();
-	tree.Erase(10);
-	tree.print();
+	//tree.print();
+	tree.print_tree();
+	tree.balance();
+	cout << "----------------------------" << endl;
+	//tree.print();
+	tree.print_tree();
 #endif // RANGE_BASED_FOR_TREE_CHECK
 
 #ifdef DEPTH_CHECK
