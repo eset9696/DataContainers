@@ -224,6 +224,7 @@ private:
 
 	void balance(Element*& Root)
 	{
+		if (Root == nullptr) return;
 		if (abs(Count(Root->pLeft) - Count(Root->pRight)) > 1)
 		{
 			int Data = Root->Data;
@@ -231,7 +232,6 @@ private:
 			insert(Data);
 			balance();
 		}
-		else return;
 		balance(Root->pLeft);
 		balance(Root->pRight);
 	}
@@ -381,8 +381,8 @@ void main()
 
 #ifdef RANGE_BASED_FOR_TREE_CHECK
 	//Tree tree = { 2000, 1998, 1900, 1800, 1700, 1600, 1500, 1400, 1300, 1200, 1100, 1000, 900, 800 };
-	//Tree tree = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711 };
-	Tree tree = {10, 20, 5, 6, 3, 15, 2, 4, 1};
+	Tree tree = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711 };
+	//Tree tree = {10, 20, 5, 6, 3, 15, 2, 4, 1};
 	//tree.print();
 	tree.print_tree();
 	tree.balance();
