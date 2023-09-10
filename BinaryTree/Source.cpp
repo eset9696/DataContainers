@@ -107,6 +107,16 @@ public:
 		print_tree(Depth, Root);
 	}
 
+	void depth_print(int depth) const
+	{
+		depth_print(Root, depth, 28);
+	}
+
+	void tree_print() const
+	{
+		tree_print(Root, 28);
+	}
+
 	void Clear()
 	{
 		Clear(Root);
@@ -209,6 +219,35 @@ private:
 		print(Root->pRight);
 	}
 
+	void depth_print(Element* Root, int depth, int width) const
+	{
+		//adjusted_depth - заданная глубина
+		if (Root == nullptr)
+		{
+			
+			return;
+		}
+		if (depth == 0)
+		{
+			cout.width(width);
+			cout << Root->Data;
+			cout.width(width);
+			cout << "";
+		}
+		depth_print(Root->pLeft, depth - 1, width);
+		depth_print(Root->pRight, depth - 1, width);
+	}
+
+	void tree_print(Element* Root, int width, int depth = 0) const
+	{
+		if (Root == nullptr) return;
+		if (depth > this->Depth()) return;
+		depth_print(Root, depth, width);
+		cout << endl;
+		cout << endl;
+		tree_print(Root, width / 2, depth + 1);
+	}
+
 	void print_tree(int Depth, Element* Root) const
 	{
 		if (Root == nullptr) return;
@@ -222,7 +261,7 @@ private:
 		print_tree(Depth + 1, Root->pRight);
 	}
 
-	void balance(Element*& Root)
+	/*void balance(Element*& Root)
 	{
 		if (Root == nullptr) return;
 		if (abs(Count(Root->pLeft) - Count(Root->pRight)) > 1)
@@ -231,6 +270,30 @@ private:
 			Erase(Root->Data);
 			insert(Data);
 			balance();
+		}
+		balance(Root->pLeft);
+		balance(Root->pRight);
+	}*/
+
+	void balance(Element* Root)
+	{
+		if (Root == nullptr) return;
+		if (abs(Count(Root->pLeft) - Count(Root->pRight)) < 2) return;
+		if(Count(Root->pLeft) < Count(Root->pRight))
+		{
+			if (Root->pLeft)insert(Root->Data, Root->pLeft);
+			else Root->pLeft = new Element(Root->Data);
+			Root->Data = minValue(Root->pRight);
+			Erase(minValue(Root->pRight), Root->pRight);
+			balance(Root);
+		}
+		else
+		{
+			if(Root->pRight)insert(Root->Data, Root->pRight);
+			else Root->pRight = new Element(Root->Data);
+			Root->Data = maxValue(Root->pLeft);
+			Erase(maxValue(Root->pLeft), Root->pLeft);
+			balance(Root);
 		}
 		balance(Root->pLeft);
 		balance(Root->pRight);
@@ -291,8 +354,9 @@ void Measure(const char* message, const Tree& tree, T (Tree::*member_function)()
 
 //#define BASE_CHECK
 //#define OLD_PERFORMANCE_CHECK
-#define RANGE_BASED_FOR_TREE_CHECK
+//#define RANGE_BASED_FOR_TREE_CHECK
 //#define DEPTH_CHECK
+#define BALANCE_CHECK
 void main()
 {
 	setlocale(LC_ALL, "");
@@ -381,21 +445,28 @@ void main()
 
 #ifdef RANGE_BASED_FOR_TREE_CHECK
 	//Tree tree = { 2000, 1998, 1900, 1800, 1700, 1600, 1500, 1400, 1300, 1200, 1100, 1000, 900, 800 };
-	Tree tree = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711 };
-	//Tree tree = {10, 20, 5, 6, 3, 15, 2, 4, 1};
+	//Tree tree = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711 };
+	Tree tree = {10, 20, 5, 6, 3, 15, 2, 4, 1};
 	//tree.print();
-	tree.print_tree();
+	//tree.print_tree();
 	tree.balance();
-	cout << "----------------------------" << endl;
+	cout << "-----------------------------------------------------" << endl;
 	//tree.print();
-	tree.print_tree();
+	//tree.print_tree();
 #endif // RANGE_BASED_FOR_TREE_CHECK
 
 #ifdef DEPTH_CHECK
-	Tree tree = { 50, 25, 75, 16, 32, 64, 90 };
+	Tree tree = { 50, 25, 75, 16, 32, 64, 90, 28, 29 };
 	tree.print();
 	cout << "Depth of tree:\t" << tree.Depth() << endl;
+	/*int depth;
+	cout << "Enter depth of tree:\t"; cin >> depth;
+	tree.depth_print(depth);*/
+	tree.tree_print();
 #endif // DEPTH_CHECK
 
-
+	Tree tree = { 89, 55, 34, 21, 13, 8, 5, 3, 3, 89 };
+	tree.tree_print();
+	tree.balance();
+	tree.tree_print();
 }
