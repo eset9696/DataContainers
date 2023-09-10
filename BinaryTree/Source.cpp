@@ -6,16 +6,20 @@ using std::cin;
 using std::cout;
 using std::endl;
 
+template <typename T> class Tree;
+template <typename T> class UniqueTree;
+
+template <typename T>
 class Tree
 {
 protected:
 	class Element
 	{
-		int Data;
+		T Data;
 		Element* pLeft;
 		Element* pRight;
 	public:
-		Element(int Data, Element* pLeft = nullptr, Element* pRight = nullptr) : Data(Data), pLeft(pLeft), pRight(pRight)
+		Element(T Data, Element* pLeft = nullptr, Element* pRight = nullptr) : Data(Data), pLeft(pLeft), pRight(pRight)
 		{
 #ifdef DEBUG
 			cout << "Element constructor:\t" << this << endl;
@@ -29,8 +33,8 @@ protected:
 #endif // DEBUG
 
 		}
-		friend class Tree;
-		friend class UniqueTree;
+		friend class Tree<T>;
+		friend class UniqueTree<T>;
 	}*Root;
 
 public:
@@ -47,9 +51,9 @@ public:
 
 	}
 
-	Tree(initializer_list<int> il) : Tree()
+	Tree(initializer_list<T> il) : Tree()
 	{
-		for (int i : il) insert(i, Root);
+		for (T i : il) insert(i, Root);
 #ifdef DEBUG
 		cout << "Tree il constructor:\t" << this << endl;
 #endif // DEBUG
@@ -65,27 +69,27 @@ public:
 
 	}
 
-	void insert(int Data)
+	void insert(T Data)
 	{
 		insert(Data, Root);
 	}
 
-	int minValue() const
+	T minValue() const
 	{
 		return minValue(Root);
 	}
 
-	int maxValue() const
+	T maxValue() const
 	{
 		return maxValue(Root);
 	}
 
-	int Sum() const
+	T Sum() const
 	{
 		return Sum(Root);
 	}
 
-	int Count() const
+	T Count() const
 	{
 		return Count(Root);
 	}
@@ -128,7 +132,7 @@ public:
 		return Depth(Root);
 	}
 
-	void Erase(int Data) 
+	void Erase(T Data) 
 	{
 		Erase(Data, Root);
 	}
@@ -139,7 +143,7 @@ public:
 	}
 	
 private:
-	void insert(int Data, Element* Root)
+	void insert(T Data, Element* Root)
 	{
 		if (this->Root == nullptr) this->Root = new Element(Data);
 		if (Root == nullptr) return;
@@ -155,7 +159,7 @@ private:
 		}
 	}
 
-	void Erase(int Data, Element*& Root)
+	void Erase(T Data, Element*& Root)
 	{
 		if (Root == nullptr) return;
 		Erase(Data, Root->pLeft);
@@ -183,25 +187,25 @@ private:
 		}
 	}
 
-	int minValue(Element* Root) const
+	T minValue(Element* Root) const
 	{
 		if (this->Root == nullptr) return 0;
 		return Root->pLeft == nullptr ? Root->Data : minValue(Root->pLeft);
 	}
 
-	int maxValue(Element* Root) const
+	T maxValue(Element* Root) const
 	{
 		if (this->Root == nullptr) return 0;
 		return Root->pRight == nullptr ? Root->Data: maxValue(Root->pRight);
 	}
 
-	int Sum(Element* Root) const
+	T Sum(Element* Root) const
 	{
 		if (this->Root == nullptr) return 0;
 		return Root == nullptr ? 0 : Sum(Root->pLeft) + Sum(Root->pRight) + Root->Data;
 	}
 
-	int Count(Element* Root) const
+	T Count(Element* Root) const
 	{
 		return Root == nullptr ? 0 : Count(Root->pLeft) + Count(Root->pRight) + 1;
 	}
@@ -317,32 +321,34 @@ private:
 
 };
 
-class UniqueTree: public Tree
+template <typename T>
+class UniqueTree: public Tree<T>
 {
 public:
-	void insert(int Data)
+	void insert(T Data)
 	{
-		insert(Data, Root);
+		insert(Data, Tree<T>::Root);
 	}
 private:
-	void insert(int Data, Element* Root)
+	void insert(T Data, typename Tree<T>::Element* Root)
 	{
-		if (this->Root == nullptr) this->Root = new Element(Data);
+		if (this->Root == nullptr)this->Root = new typename Tree<T>::Element(Data);
 		if (Root == nullptr) return;
 		if (Data < Root->Data)
 		{
-			if (Root->pLeft == nullptr)Root->pLeft = new Element(Data);
+			if (Root->pLeft == nullptr) Root->pLeft = new typename Tree<T>::Element(Data);
 			else insert(Data, Root->pLeft);
 		}
 		else if (Data > Root->Data)
 		{
-			if (Root->pRight == nullptr) Root->pRight = new Element(Data);
+			if (Root->pRight == nullptr) Root->pRight = new typename Tree<T>::Element(Data);
 			else insert(Data, Root->pRight);
 		}
 	}
 };
-template <typename T>
-void Measure(const char* message, const Tree& tree, T (Tree::*member_function)() const)
+
+template <typename T, typename U>
+void Measure(const char* message, const Tree<U>& tree, T (Tree<U>::*member_function)() const)
 {
 	cout << message;
 	clock_t start = clock();
@@ -465,8 +471,19 @@ void main()
 	tree.tree_print();
 #endif // DEPTH_CHECK
 
-	Tree tree = { 89, 55, 34, 21, 13, 8, 5, 3, 3, 89 };
-	tree.tree_print();
-	tree.balance();
-	tree.tree_print();
+	Tree<int> tree = { 89, 55, 34, 21, 13, 8, 5, 3, 3 };
+	UniqueTree <double> u_tree;
+	for (int i = 0; i < 10; i++)
+	{
+		u_tree.insert(i + 1.15*3);
+		u_tree.insert(i + 1.15*3);
+	}
+
+	//tree.tree_print();
+	u_tree.print_tree();
+	//Measure("Avg work time:\t", tree, &Tree<int>::Avg);
+	//tree.balance();
+	u_tree.balance();
+	//tree.tree_print();
+	u_tree.print_tree();
 }
